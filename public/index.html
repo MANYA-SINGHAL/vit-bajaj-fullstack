@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIT Full Stack API - Manya Singhal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+
+    .student-info {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .student-info p {
+      margin: 5px 0;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 8px;
+      font-family: monospace;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin: 10px 5px 10px 0;
+      padding: 8px 16px;
+      border: 1px solid #444;
+      background: #eee;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ddd;
+    }
+
+    #status {
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    #output {
+      background: #f1f1f1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      min-height: 100px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>VIT Full Stack API</h1>
+    <h2>Array Processing REST API</h2>
+
+    <div class="student-info">
+      <p><strong>Student Name:</strong> Manya Singhal</p>
+      <p><strong>Roll Number:</strong> 22BCB0198</p>
+      <p><strong>Email:</strong> manya.singhal2022@vitstudent.ac.in</p>
+      <p><strong>API Endpoint:</strong> POST /bfhl</p>
+    </div>
+
+    <label for="dataInput">Enter Array Data (JSON format):</label>
+    <textarea id="dataInput">["a","1","334","4","R", "$"]</textarea>
+    
+    <div>
+      <button onclick="processData()">Process Data</button>
+      <button onclick="clearAll()">Clear</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="output">Click "Process Data" to see API response...</div>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin + '/bfhl';
+
+    function showStatus(message) {
+      document.getElementById('status').textContent = message;
+    }
+
+    async function processData() {
+      const input = document.getElementById('dataInput').value.trim();
+      const outputDiv = document.getElementById('output');
+
+      try {
+        if (!input) {
+          showStatus("Please enter some data!");
+          return;
+        }
+
+        let dataArray;
+        try {
+          dataArray = JSON.parse(input);
+          if (!Array.isArray(dataArray)) throw new Error();
+        } catch {
+          showStatus("Invalid JSON format! Please enter an array.");
+          return;
+        }
+
+        showStatus("Processing...");
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: dataArray })
+        });
+
+        const result = await response.json();
+        if (response.ok && result.is_success) {
+          showStatus("Data processed successfully!");
+        } else {
+          showStatus("API Error: " + (result.error || "Unknown"));
+        }
+
+        outputDiv.textContent = JSON.stringify(result, null, 2);
+
+      } catch (err) {
+        showStatus("Network Error: " + err.message);
+        outputDiv.textContent = err.message;
+      }
+    }
+
+    function clearAll() {
+      document.getElementById('dataInput').value = '';
+      document.getElementById('output').textContent = 'Click "Process Data" to see API response...';
+      document.getElementById('status').textContent = '';
+    }
+  </script>
+</body>
+</html>
